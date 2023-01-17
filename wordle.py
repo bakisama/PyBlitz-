@@ -1,3 +1,12 @@
+'''TODO:
+[X] Add gui
+[X] Add fullscreen
+[X] Add keyboard
+[X] Add backspace
+[X] Add keyboard update logic
+[] Add help icon text
+[] Add settings text
+'''
 from tkinter import messagebox, ttk
 from pathlib import Path
 
@@ -273,7 +282,29 @@ class Wordle(tk.Frame):
     def check_word(self, event=None):
         print("checking word:", self.words[self.current_word])
         word = self.words[self.current_word]
-        # ADD WORDLE LOGIC HERE
+        if len(word) < WORD_LEN:
+            messagebox.showinfo("Error", "Word must be 5 letters long.")
+            return
+
+        if word not in ALL_WORDS:
+            messagebox.showinfo("Error", "Word not found in dictionary.")
+            return
+
+        color = []
+        freq = {c: self.answer.count(c) for c in self.answer}
+        for x, y in zip(word, self.answer):
+            if x == y:
+                color.append(COLOR_CORRECT)
+                self.correct_letters.add(x)
+            elif freq.get(x, 0) > 0:
+                color.append(COLOR_HALF_CORRECT)
+                self.half_correct_letter.add(x)
+                freq[x] -= 1
+            else:
+                self.incorrect_letters.add(x)
+                color.append(COLOR_INCORRECT)
+        self.update_labels(color)
+        self.update_keyboard()
 
         if word == self.answer:
             self.congratulate()
